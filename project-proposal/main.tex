@@ -38,24 +38,32 @@
 
 % -----------------------------------------------------
 
-\title{Grievance-Resolution System for a Tier-2/3 City}
+\title{AI-Powered Student Workload Balancer}
 
-\BvrSetLabInstructor{Dr. Raghav B. Venkataramaiyer}
+\BvrSetLabInstructor{Dr. Nisha Thakur}
 
 \BvrSubtitle{%
   Project Proposal for UCS503P  \\
   Submitted to: \BvrLabInstructorValue \\ \bfseries
-  Thapar Institute of Engineering and Technology% 
+  Thapar Institute of Engineering and Technology%
 }
 
 \author{
-  Vidya Vaidyanathan, CSED%
-  \thanks{Roll No: \texttt{1024030xxx}, %
-    Email: \texttt{vvaidhanathan\_be24\@thapar.edu}}
-  \and 
-  Bhanurekha Ganesan, CSED%
-  \thanks{Roll No: \texttt{1024030xxx}, %
-    Email: \texttt{bganesan\_be24\@thapar.edu}}
+  Khushi, CSED%
+  \thanks{Roll No: \texttt{1024030809}, %
+    Email: \texttt{kkhushi1\_be24\@thapar.edu}}
+  \and
+  Umang Gautam, CSED%
+  \thanks{Roll No: \texttt{1024030805}, %
+    Email: \texttt{ugautam\_be24\@thapar.edu}}
+  \and
+  Vriti Mahajan, CSED%
+  \thanks{Roll No: \texttt{1024030801}, %
+    Email: \texttt{vmahajan1\_be24\@thapar.edu}}
+  \and
+  Shaurya Garg, CSED%
+  \thanks{Roll No: \texttt{1024030800}, %
+    Email: \texttt{sgarg6\_be24\@thapar.edu}}
 }
 
 \date{\today}
@@ -65,80 +73,84 @@
 
 \section{Higher-order goal%
   \BvrHint{\ldots secondary framing}}
-This project aims to improve sustainable urban
-governance by reducing the time and effort required to
-resolve citizen issues. While the topic is broader than
-any single municipality, the immediate engineering
-objective is to translate \emph{efficient public
-  service delivery} into a measurable, deployable
-software solution.
+This project aims to improve student time-management outcomes by
+reducing the cognitive overhead of planning academic workload across
+subjects, topics, and deadlines. While the broader goal is student
+well-being and academic performance, the immediate engineering
+objective is to translate \emph{adaptive workload planning} into a
+measurable, deployable software solution.
 
 \section{Time-to-value %
 \BvrHint{\ldots primary heuristic}}
 \begin{itemize}[leftmargin=0.7cm]
-    \item We will deliver meaningful increments quickly by prototyping the core user workflow and validating it with users within a short iteration window.
+    \item We will deliver meaningful increments quickly by prototyping the core planning workflow (input subjects/hours/deadlines $\rightarrow$ generated plan) and validating it with users within a short iteration window.
     \item We will prioritize fast feedback over perfection by using weekly iterations (and targeting CI-backed automation early) to reduce release friction.
     \item Success is defined by what can be delivered and measured in the first iteration, then improved based on user feedback.
 \end{itemize}
 
 \section{Problem Statement}
-Citizens in a tier-2/3 Indian city face delays and uncertainty when reporting local issues (e.g., streetlight outages, water leakage, garbage accumulation, road potholes). Common pain points include:
+Students juggling multiple subjects, assignments, and deadlines
+struggle to allocate limited study time effectively. Common pain
+points include:
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Fragmentation:} complaints are often made via multiple channels (calls, social media, paper forms), causing lost context.
-    \item \textbf{Low transparency:} citizens cannot easily see the status of their complaint (e.g., ``received'', ``assigned'', ``in progress'', ``resolved'').
-    \item \textbf{Slow coordination:} departments/field teams lack a unified, trackable workflow with clear ownership.
-    \item \textbf{Poor data quality:} duplicate or incomplete reports force rework and extend resolution time.
+    \item \textbf{Static planning:} manually made schedules quickly become outdated once a student falls behind or a deadline shifts.
+    \item \textbf{No feedback loop:} most planning tools do not adapt based on actual progress or performance, leaving students to manually re-plan.
+    \item \textbf{Uneven workload distribution:} without a systematic priority scheme, students over-invest in familiar subjects and under-invest in weak or high-stakes ones.
+    \item \textbf{Opaque reasoning:} even when a tool suggests a plan, students rarely understand \emph{why} that plan was chosen, reducing trust and adoption.
 \end{itemize}
 
-\textbf{Why this matters now (contextual relevance):} In an urban setting with limited staff bandwidth, even small process improvements can noticeably reduce resolution delays and repeated submissions.
+\textbf{Why this matters now (contextual relevance):} With increasing academic load and limited study hours, even small improvements in workload distribution and re-planning speed can noticeably reduce student stress and missed deadlines.
 
 \section{Proposed Solution %
 \BvrHint{\ldots Software Proposition}}
 \subsection{Overview}
-Build a \textbf{web-based} ``Grievance-to-Resolution'' system with the following components:
+Build a \textbf{web-based} ``AI-Powered Student Workload Balancer''
+with the following components:
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Citizen submission portal:} users submit an issue with photo (optional), category, and locality/ward.
-    \item \textbf{Automated triage:} basic duplicate detection and completeness checks.
-    \item \textbf{Department workflow:} assign issues to relevant department/team and update statuses.
-    \item \textbf{Status transparency:} citizens track status and receive notifications when resolved.
-    \item \textbf{Admin/ops dashboard:} performance summaries (resolution time, backlog).
+    \item \textbf{Student input portal:} students enter subjects, topics, available study hours, deadlines, and assignments.
+    \item \textbf{Deterministic workload engine:} a rules-based backend service computes a personalized, prioritized study plan from the inputs and performance history.
+    \item \textbf{Adaptive feedback loop:} the plan is continuously re-balanced based on actual progress and performance reported by the student.
+    \item \textbf{Reasoning agent:} a LangGraph-based agent explains \emph{why} the plan looks the way it does, without altering the underlying business logic.
+    \item \textbf{Progress dashboard:} students track plan adherence and upcoming priorities.
 \end{itemize}
 
 \subsection{Core workflow}
 \begin{enumerate}[leftmargin=0.7cm]
-    \item Citizen creates a complaint and receives a complaint ID immediately.
-    \item System validates completeness and suggests possible duplicates (lightweight similarity on text/category and approximate location).
-    \item Department staff update status (Received $\rightarrow$ Assigned $\rightarrow$ In Progress $\rightarrow$ Resolved).
-    \item Citizen views status updates and resolution notes.
+    \item Student registers subjects, topics, available hours, and deadlines.
+    \item The deterministic workload engine computes a prioritized study plan using a scoring algorithm (deadline proximity, topic weight, past performance).
+    \item Student follows the plan and logs actual progress (completed/missed sessions, performance on topics).
+    \item The engine re-balances the remaining plan based on this feedback; the agent explains the change in plain language on request.
 \end{enumerate}
 
-\subsection{Operational constraints for an educational, tier-2/3 setting}
+\subsection{Operational constraints for an educational setting}
 \begin{itemize}[leftmargin=0.7cm]
     \item Keep the solution usable on low-to-mid range devices via responsive web design.
-    \item Avoid dependence on advanced research algorithms; focus on workflow, automation, and system correctness.
+    \item Keep all scheduling logic deterministic and auditable; the AI agent may only reason over and explain outputs, never bypass business rules.
     \item Design for deployability using common web hosting and managed databases.
 \end{itemize}
 
 \section{Solution Approach %
 \BvrHint{\ldots Engineering focus}}
-This is an engineering course project, so we focus on scalable administrative and workflow aspects rather than novel algorithm research.
+This is an engineering course project, so we focus on a layered,
+maintainable system architecture rather than novel algorithm
+research.
 
-\subsection{Duplicate/quality assistance %
+\subsection{Deterministic engine + reasoning agent %
 \BvrHint{\ldots non-research}}
-Duplicate detection will be heuristic-based:
+Prioritization will be heuristic-based, not black-box:
 \begin{itemize}[leftmargin=0.7cm]
-    \item Normalize text (category + short description keywords).
-    \item Use a simple similarity measure (e.g., token overlap / TF-IDF cosine with threshold) without claiming state-of-the-art.
-    \item Show top candidate duplicates to staff for decision; never fully auto-delete or auto-reject.
+    \item Compute a priority score per topic from deadline proximity, estimated effort, and past performance.
+    \item Allocate available study hours across topics in priority order using a pure-function, testable scoring service.
+    \item The LangGraph agent calls this service via tools rather than accessing the database directly, so it is structurally unable to bypass the deterministic business rules -- it can only explain the engine's output, not override it.
 \end{itemize}
 
 \subsection{Web architecture %
 \BvrHint{\ldots web-based solution}}
-A typical 3-tier web architecture:
+A layered, one-directional web architecture:
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Frontend:} responsive UI for citizens and staff (status pages, submission form, dashboard).
-    \item \textbf{Backend API:} authentication, complaint submission, status transitions, assignment logic.
-    \item \textbf{Database:} store users, complaints, status history, attachments metadata.
+    \item \textbf{Frontend (React):} responsive UI for subject/deadline entry, plan viewing, and progress logging.
+    \item \textbf{Backend API (FastAPI):} routes $\rightarrow$ services $\rightarrow$ repositories $\rightarrow$ database, a strict one-directional layering enforced structurally rather than by convention.
+    \item \textbf{Database (PostgreSQL, via SQLAlchemy ORM):} stores students, subjects, topics, plans, progress logs, and performance history.
 \end{itemize}
 
 \subsection{CI/CD and fast delivery enabler}
@@ -151,92 +163,104 @@ CI/CD will be used to:
 
 \section{Evaluation Criterion %
 \BvrHint{\ldots measurable and attributable}}
-We define success using measurable metrics tied to the core workflow.
+We define success using measurable metrics tied to the core adaptive
+planning workflow.
 
 \subsection{Primary evaluation metric}
-\textbf{Time-to-acknowledgement (TTA):} time between complaint submission and ``Received/Assigned'' status creation in the system.
+\textbf{Plan adherence:} the percentage of planned study hours/sessions actually completed by the student, as logged in the system.
 \begin{itemize}[leftmargin=0.7cm]
-    \item Target: median TTA $\le$ 2 hours during pilot window.
-    \item Attribution: measured from database timestamps (submission vs. first status update by staff).
+    \item Target: median plan adherence $\ge$ 70\% during pilot window.
+    \item Attribution: measured from database timestamps comparing planned sessions vs. logged completions.
 \end{itemize}
 
 \subsection{Secondary evaluation metrics}
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Resolution time reduction:} reduce time-to-resolved compared to baseline process (even if baseline is collected via survey).
-    \item \textbf{Duplicate rate:} percentage of complaints flagged as duplicates and resolved without rework.
-    \item \textbf{User clarity:} citizen-reported clarity of status using a simple 1--5 feedback question.
-    \item \textbf{Reliability:} availability of staging/production for login and submission during business hours (e.g., $\ge$ 99\% uptime in pilot).
+    \item \textbf{Rebalancing responsiveness:} how accurately and quickly the engine redistributes remaining workload after a missed or completed session, measured against remaining time-to-deadline.
+    \item \textbf{Deadline miss rate:} percentage of tracked deadlines missed compared to a baseline (self-reported prior habits).
+    \item \textbf{User trust/clarity:} student-reported clarity of plan reasoning using a simple 1--5 feedback question after viewing an agent explanation.
+    \item \textbf{Reliability:} availability of staging/production for login and plan generation during typical study hours (e.g., $\ge$ 99\% uptime in pilot).
 \end{itemize}
 
 \subsection{Pilot validation plan %
 \BvrHint{\ldots high-level}}
 \begin{itemize}[leftmargin=0.7cm]
-    \item Recruit 10--20 pilot users (citizens) and 3--5 staff roles (department simulation if real staff unavailable).
-    \item Compare metrics before/after within the iteration window by logging baseline estimates via short interviews or existing process observations.
+    \item Recruit 10--20 pilot student users across varying course loads.
+    \item Compare plan adherence and self-reported stress/deadline-miss rate before/after within the iteration window.
 \end{itemize}
 
 \section{Scalability %
 \BvrHint{\ldots with foresight}}
-The proposition should scale in both theoretical and practical senses.
+The proposition should scale in both theoretical and practical
+senses.
 
 \begin{enumerate}[leftmargin=0.7cm]
-    \item \textbf{Scalable (theoretically):} The system should support growth in number of complaints and concurrent dashboard usage by:
+    \item \textbf{Scalable (theoretically):} The system should support growth in number of students, subjects, and concurrent plan re-computation by:
     \begin{itemize}[leftmargin=0.7cm]
-        \item decoupling components (frontend/backend),
+        \item decoupling components (frontend/backend/agent),
         \item enabling pagination and indexing for common queries,
-        \item using stateless API design.
+        \item using stateless API design for the deterministic engine.
     \end{itemize}
-    
+
     \item \textbf{Operationally deployable (practically):} The system should run on common web hosting:
     \begin{itemize}[leftmargin=0.7cm]
-        \item managed database,
+        \item managed PostgreSQL database,
         \item containerized or platform-hosted deployment,
         \item CI/CD pipeline for staging/production.
     \end{itemize}
 \end{enumerate}
 
 \section{Engine availability heuristic}
-A mature set of ``engines'' (tooling/services) is available to implement this as a web-based project:
+A mature set of ``engines'' (tooling/services) is available to
+implement this as a web-based project:
 \begin{itemize}[leftmargin=0.7cm]
-    \item Web framework for REST APIs and templated/reactive pages.
-    \item Managed relational or document database.
-    \item Authentication approach (token-based or session-based).
-    \item Object storage for optional attachments (or local storage for pilot).
-    \item Test framework for unit/integration tests.
+    \item Web framework for REST APIs (FastAPI) and reactive frontend (React).
+    \item Managed relational database (PostgreSQL) with a mature ORM (SQLAlchemy).
+    \item Agent orchestration framework (LangGraph) for the explanation layer.
+    \item Authentication approach (token-based).
+    \item Test framework for unit/integration tests (pytest).
     \item CI runner and staging deployment target.
 \end{itemize}
-We will use these mature components to focus on workflow design, correctness, and measurement rather than inventing new infrastructure.
+We will use these mature components to focus on workload-engine
+correctness, layered architecture, and measurement rather than
+inventing new infrastructure.
 
 \section{Project scope and deliverables %
 \BvrHint{\ldots iteration-friendly}}
 \subsection{Initial deliverable %
 \BvrHint{\ldots first iteration}}
 \begin{itemize}[leftmargin=0.7cm]
-    \item Citizen submission form + complaint ID generation
-    \item Staff workflow: update status and assignment
-    \item Citizen status page: view timeline/history
-    \item Basic logging and timestamps for TTA measurement
+    \item Subject/topic/deadline input form + student profile
+    \item Deterministic priority-scoring workload engine (pure functions)
+    \item Generated study plan view
+    \item Basic progress logging and timestamps for adherence measurement
     \item CI: build + backend unit tests + linting
     \item CD to staging with a single command or pipeline job
 \end{itemize}
 
 \subsection{Subsequent deliverables}
 \begin{itemize}[leftmargin=0.7cm]
-    \item Lightweight duplicate suggestions with staff review
-    \item Notification layer (email/SMS optional in later iteration; can start with in-app notifications)
-    \item Admin dashboard for metrics and backlog
-    \item Improved search/filtering and indexed queries for scale readiness
+    \item Continuous feedback loop: re-balancing plan from logged progress
+    \item LangGraph agent for plan explanation via tool calls
+    \item Performance-history-aware prioritization
+    \item Progress dashboard with adherence and rebalancing metrics
 \end{itemize}
 
 \section{Risks and mitigations}
 \begin{itemize}[leftmargin=0.7cm]
-    \item \textbf{Data privacy / consent:} minimize collected data; keep attachments optional; store only what is needed.
-    \item \textbf{Staff adoption:} provide an easy UI for status updates; keep workflow steps minimal; include shortcuts.
-    \item \textbf{Evaluation measurement ambiguity:} instrument timestamps and define clear status transitions before development begins.
-    \item \textbf{Operational issues in pilot:} use staging early; ensure CI/CD produces repeatable deployments.
+    \item \textbf{Data privacy / consent:} minimize collected personal data; store only what is needed for planning and evaluation.
+    \item \textbf{Student adoption:} keep input workflow minimal; provide sensible defaults so a first plan can be generated quickly.
+    \item \textbf{Evaluation measurement ambiguity:} instrument timestamps and define clear session/completion states before development begins.
+    \item \textbf{Agent overreach:} enforce strict tool-based access so the agent cannot bypass the deterministic engine's business rules.
 \end{itemize}
 
 \section{Summary}
-This project proposes a deployable web platform to reduce grievance handling delays in a tier-2/3 city context. It meets the course criteria by emphasizing time-to-value through rapid iterations, implementing CI/CD to support frequent safe releases, and using measurable evaluation criteria (especially time-to-acknowledgement). It remains focused on engineering workflow and scalability readiness rather than research-driven novelty.
+This project proposes a deployable web platform that generates and
+continuously adapts a personalized student study plan. It meets the
+course criteria by emphasizing time-to-value through rapid
+iterations, implementing CI/CD to support frequent safe releases,
+and using measurable evaluation criteria (especially plan
+adherence). It remains focused on engineering workflow, layered
+architecture, and structural safety of the AI reasoning layer rather
+than research-driven novelty.
 
 \end{document}
