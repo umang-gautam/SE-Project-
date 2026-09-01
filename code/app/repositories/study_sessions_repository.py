@@ -1,4 +1,4 @@
-﻿from app.core.supabase_client import get_client
+from app.core.supabase_client import get_client
 
 
 async def get_all_sessions() -> list[dict]:

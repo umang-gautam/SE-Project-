@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from app.schemas.study_plan import StudyPlanCreate, StudyPlanOut
 from app.services import study_plan_service

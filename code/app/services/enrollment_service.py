@@ -1,4 +1,4 @@
-﻿from app.repositories import enrollments_repository
+from app.repositories import enrollments_repository
 
 
 async def list_enrollments() -> list[dict]:

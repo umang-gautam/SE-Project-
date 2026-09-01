@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from app.schemas.performance_record import PerformanceRecordCreate, PerformanceRecordOut
 from app.services import performance_record_service
