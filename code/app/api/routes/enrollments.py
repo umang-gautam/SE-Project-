@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from app.schemas.enrollment import EnrollmentCreate, EnrollmentOut
 from app.services import enrollment_service

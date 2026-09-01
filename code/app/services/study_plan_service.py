@@ -1,4 +1,4 @@
-﻿from app.repositories import study_plans_repository
+from app.repositories import study_plans_repository
 
 
 async def list_plans() -> list[dict]:

@@ -1,4 +1,4 @@
-﻿from app.repositories import study_sessions_repository
+from app.repositories import study_sessions_repository
 
 
 async def list_sessions() -> list[dict]:

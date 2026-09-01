@@ -1,4 +1,4 @@
-﻿from app.repositories import subjects_repository
+from app.repositories import subjects_repository
 
 
 async def list_subjects() -> list[dict]:

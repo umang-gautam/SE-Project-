@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
 from app.api.routes import (
     health, students, subjects, enrollments, topics,
     assignments, performance_records, study_plans, study_sessions

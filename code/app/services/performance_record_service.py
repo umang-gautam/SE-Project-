@@ -1,4 +1,4 @@
-﻿from app.repositories import performance_records_repository
+from app.repositories import performance_records_repository
 
 
 async def list_records() -> list[dict]:

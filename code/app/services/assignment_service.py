@@ -1,4 +1,4 @@
-﻿from app.repositories import assignments_repository
+from app.repositories import assignments_repository
 
 
 async def list_assignments() -> list[dict]:

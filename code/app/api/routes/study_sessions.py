@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from app.schemas.study_session import StudySessionCreate, StudySessionOut
 from app.services import study_session_service

@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from app.schemas.assignment import AssignmentCreate, AssignmentOut
 from app.services import assignment_service
