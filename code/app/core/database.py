@@ -1,18 +1,31 @@
+from functools import lru_cache
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.core.config import settings
 
-engine = create_engine(settings.database_url)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+class Base(DeclarativeBase):
+    """Declarative base shared by every model in app.models."""
 
-Base = declarative_base()
+
+@lru_cache(maxsize=1)
+def get_engine() -> Engine:
+    """Build the engine on first use, not at import time.
+
+    The API's request path talks to Supabase over REST, so DATABASE_URL is
+    optional. Importing this module must not fail when it is unset.
+    """
+    if not settings.database_url:
+        raise RuntimeError("DATABASE_URL is not set")
+    return create_engine(settings.database_url, pool_pre_ping=True)
 
 
 def get_db():
-    db = SessionLocal()
+    session = sessionmaker(autocommit=False, autoflush=False, bind=get_engine())()
     try:
-        yield db
+        yield session
     finally:
-        db.close()
+        session.close()

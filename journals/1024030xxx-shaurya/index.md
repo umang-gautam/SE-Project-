@@ -30,3 +30,27 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 ### Next steps
 - Make the API start without `DATABASE_URL`, since Supabase REST is the real data path.
 - Turn `/health` into something a container orchestrator can actually use.
+
+---
+
+## 2026-09-02 — Phase 6: Lazy DB engine and a real health check
+
+**Status:** Complete
+
+### What I did
+- `app/core/database.py` no longer creates the SQLAlchemy engine at import time. `get_engine()` builds it on first call and raises a clear error if `DATABASE_URL` is unset.
+- Replaced `declarative_base()` with a `DeclarativeBase` subclass, the SQLAlchemy 2.0 form, so the models in the next phase can use `Mapped[]` annotations against it.
+- `/health` now reports three fields: `status`, `database`, `supabase`. Each backing service is probed and reported as `ok`, `unconfigured`, or `error: <reason>`.
+- Removed the duplicate `test_db_connection.py` at the repo root; the one inside `code/` is the one the journal and `pyproject.toml` refer to.
+
+### Key decisions & reasoning
+- **Decision:** `/health` always returns HTTP 200 and puts the dependency state in the body.
+  **Why:** A Docker or Kubernetes healthcheck that fails when Supabase blips would restart a perfectly good container. Liveness and dependency status are different questions.
+- **Decision:** Keep `DATABASE_URL` optional.
+  **Why:** The request path uses Supabase REST. Direct Postgres access is only for schema work and local checks, and the API must boot without it.
+
+### Challenges & how I solved them
+- `from app.core.database import Base` would have crashed on `create_engine(None)` before any model code could load. Making the engine lazy fixed this without touching callers.
+
+### Next steps
+- Write the eight SQLAlchemy models against the new `Base`.
