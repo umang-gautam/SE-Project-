@@ -54,3 +54,31 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - Write the eight SQLAlchemy models against the new `Base`.
+
+---
+
+## 2026-09-03 — Phase 7: SQLAlchemy models for the eight tables
+
+**Status:** Complete
+
+### What I did
+- Wrote one model file per table under `code/app/models/`: `Student`, `Subject`, `Enrollment`, `Topic`, `Assignment`, `PerformanceRecord`, `StudyPlan`, `StudySession`. All use the SQLAlchemy 2.0 `Mapped[]` + `mapped_column()` style against the `Base` from Phase 6.
+- Column names and types mirror the pydantic schemas in `app/schemas/`, so the model is a faithful description of what Supabase already holds.
+- `app/models/__init__.py` imports every model, so a single import registers the full schema on `Base.metadata`.
+- Verified with `Base.metadata.create_all()` against an in-memory SQLite engine that all eight tables build with no circular-import or FK errors.
+
+### Key decisions & reasoning
+- **Decision:** Keep Phase 4's schema exactly. `Topic` under `Subject`, `PerformanceRecord` on `Topic`, `Assignment` as urgency only, `StudyPlan` and `StudySession` separate.
+  **Why:** Those decisions were argued out already; the models should encode them, not reopen them. Each file carries a one-line docstring restating the reason so it survives without the journal.
+- **Decision:** `ON DELETE CASCADE` on every child FK, `SET NULL` on the self-reference in `StudySession`.
+  **Why:** Deleting a student should take their plans and sessions with them. Deleting a session that others were rebalanced from should not delete those newer sessions.
+- **Decision:** Unique constraint on `(student_id, subject_id)` in `Enrollment`.
+  **Why:** Enrolling twice in the same subject is always a bug, and a DB constraint is cheaper than app-side checks.
+- **Decision:** Models are not wired into the repositories.
+  **Why:** The API stays on Supabase REST. The models exist for schema-as-code, local Postgres, and the future scoring engine. Rewriting eight repositories is a separate, deliberate change.
+
+### Challenges & how I solved them
+- `Mapped[str | None]` needs Python 3.10+. Confirmed the Dockerfile in the next phase will pin 3.12 so this never bites in a container.
+
+### Next steps
+- Containerise the API so the same image runs locally, in CI, and on a host.
