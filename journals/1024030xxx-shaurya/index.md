@@ -82,3 +82,31 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - Containerise the API so the same image runs locally, in CI, and on a host.
+
+---
+
+## 2026-09-04 — Phase 8: Containerising the API
+
+**Status:** Complete
+
+### What I did
+- Added `code/Dockerfile`: `python:3.12-slim`, requirements installed in their own layer, app copied after, runs as a non-root `api` user, exposes 8000, runs uvicorn.
+- Added `code/.dockerignore` so the venv, `.env`, tests and the PowerShell scaffold never end up in the image.
+- Added `code/scripts/init_db.py`, which runs `Base.metadata.create_all()` against `DATABASE_URL`. This is how a fresh Postgres gets the schema in the next phase.
+- Built the image and confirmed: it boots without `DATABASE_URL`, runs as `api` not root, and `GET /health` returns `{"status":"ok","database":"unconfigured","supabase":"error: ConnectError"}` when pointed at a dead Supabase URL. That last part is the point: the container stays up and tells you what is wrong.
+
+### Key decisions & reasoning
+- **Decision:** Copy `requirements.txt` and install before copying `app/`.
+  **Why:** Docker caches layers top-down. Code changes daily, dependencies weekly. This ordering makes a rebuild after a code edit take seconds.
+- **Decision:** Non-root user inside the container.
+  **Why:** Costs two lines and removes a whole class of container-escape concerns. Hosts and CI scanners increasingly refuse root images.
+- **Decision:** `HEALTHCHECK` hits `/health` and only checks for a 200.
+  **Why:** Same reasoning as Phase 6. Docker's healthcheck decides whether to restart the container; a dead Supabase should not trigger that.
+- **Decision:** `.env.example` is excluded from the image, `.env` too.
+  **Why:** Config comes in through environment variables at run time. Baking any env file into an image is how secrets leak into registries.
+
+### Challenges & how I solved them
+- First build attempt copied `scripts/` before the folder existed. Created `init_db.py` first, then built.
+
+### Next steps
+- `docker-compose.yml` with the API and a Postgres, so the whole backend runs with one command.
