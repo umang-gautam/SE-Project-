@@ -1,6 +1,7 @@
 """Create all eight tables in the database named by DATABASE_URL.
 
-Usage: python scripts/init_db.py
+Usage (from code/): PYTHONPATH=. python scripts/init_db.py
+       or: docker compose run --rm api python scripts/init_db.py
 Idempotent: existing tables are left alone.
 """
 from app.core.database import get_engine

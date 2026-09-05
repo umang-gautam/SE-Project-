@@ -110,3 +110,29 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - `docker-compose.yml` with the API and a Postgres, so the whole backend runs with one command.
+
+---
+
+## 2026-09-05 — Phase 9: docker-compose with Postgres
+
+**Status:** Complete
+
+### What I did
+- Added `code/docker-compose.yml` with two services: `api` (built from the Dockerfile) and `db` (`postgres:16-alpine` with a named volume and a `pg_isready` healthcheck). The API waits for the DB to be healthy before starting.
+- `api` reads Supabase values from `.env` and gets `DATABASE_URL` injected by compose, pointing at the `db` service.
+- Ran the full loop: `docker compose up --build`, then `docker compose run --rm api python scripts/init_db.py`. Postgres ended up with all eight tables and `/health` reported `"database": "ok"`.
+- Updated `.env.example` with the `DATABASE_URL` to use when running uvicorn outside compose against the compose Postgres.
+
+### Key decisions & reasoning
+- **Decision:** Postgres in compose is for schema work and local experiments. The API's request path still goes to Supabase.
+  **Why:** Agreed scope. The repositories are not rewritten. Having a real Postgres locally lets the scoring engine and any future SQLAlchemy code be developed and tested without touching the shared Supabase project.
+- **Decision:** Hardcode `balancer/balancer` credentials in compose.
+  **Why:** They only ever bind to localhost on a dev machine. Parameterising them would add indirection for nobody.
+- **Decision:** `depends_on` with `condition: service_healthy` rather than a retry loop in the app.
+  **Why:** Compose already solves startup ordering. App-side retry logic is code that has to be maintained.
+
+### Challenges & how I solved them
+- `python scripts/init_db.py` inside the container failed with `No module named 'app'`. Python puts the script's own folder on `sys.path`, not the working directory. Fixed by setting `ENV PYTHONPATH=/app` in the Dockerfile, which also makes any future script under `scripts/` work the same way.
+
+### Next steps
+- Tests that run without Supabase credentials, and a GitHub Actions workflow that runs them and builds the image on every push.
