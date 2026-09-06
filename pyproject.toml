@@ -1,4 +1,4 @@
-﻿
+
 [build-system]
 requires = ["hatchling","hatch-vcs"]
 build-backend = "hatchling.build"
@@ -38,4 +38,5 @@ Issues = "https://github.com/tiet-unc512/ucs503p-202627odd-template/issues"
 pythonpath = [
   "code"
 ]
+testpaths = ["code/tests"]
 # THE END -------------------------------------------

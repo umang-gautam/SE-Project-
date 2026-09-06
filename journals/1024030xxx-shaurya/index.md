@@ -136,3 +136,35 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - Tests that run without Supabase credentials, and a GitHub Actions workflow that runs them and builds the image on every push.
+
+---
+
+## 2026-09-06 — Phase 10: Tests and CI
+
+**Status:** Complete
+
+### What I did
+- Added `code/tests/` with six tests across four files, runnable with a bare `pytest` from the repo root and no credentials:
+  - `test_health.py`: unconfigured DB and unreachable Supabase are reported in the body; an unreachable Postgres URL yields `error: ...` instead of an exception.
+  - `test_students.py`: list, 404 on missing id, and POST validation (a bad email is rejected with 422 before the repository is ever called).
+  - `test_models.py`: all eight tables build from the models.
+  - `conftest.py`: sets dummy Supabase env vars so `Settings()` constructs, and provides a `TestClient`.
+- Added `code/requirements-dev.txt` (just pytest) and `testpaths` in `pyproject.toml` so pytest does not try to collect `test_db_connection.py`, which is a manual script.
+- Added `.github/workflows/backend.yml`: on push to main and on PRs touching `code/`, install, run pytest, build the Docker image, start it, and curl `/health`.
+
+### Key decisions & reasoning
+- **Decision:** Tests replace the repository layer with `monkeypatch`, not the HTTP client.
+  **Why:** The repository is the boundary Khushi drew in Phase 2. Testing above it exercises routes, schemas and services together, which is where the logic lives. Mocking httpx would test Supabase's URL conventions instead.
+- **Decision:** No pytest plugins, no fixtures beyond `client`.
+  **Why:** Six tests do not need infrastructure. Add it when a test needs it.
+- **Decision:** CI smoke-tests the built image, not just the build.
+  **Why:** A Dockerfile that builds but produces an image that crashes on start is the most common container bug. Fifteen seconds of curl in CI catches it.
+- **Decision:** Workflow triggers are path-filtered.
+  **Why:** A journal edit should not spend CI minutes building a Docker image.
+
+### Challenges & how I solved them
+- My first health test monkeypatched a probe function to raise and asserted the endpoint still returned 200. It failed, correctly: the probes catch their own errors, the handler does not, and there is no reason it should. The test was asserting behaviour nobody designed. Rewrote it to use a real failure, an unreachable `DATABASE_URL`, which is what the code actually guards against.
+- `get_engine()` is `lru_cache`d, so a test that changes `DATABASE_URL` must clear the cache before and after. Done in the test with a `try/finally`.
+
+### Next steps
+- Documentation: README, project index and setup pages describing what actually exists, and the mkdocs fixes so the journals appear on the site.
