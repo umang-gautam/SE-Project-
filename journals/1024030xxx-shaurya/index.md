@@ -168,3 +168,34 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - Documentation: README, project index and setup pages describing what actually exists, and the mkdocs fixes so the journals appear on the site.
+
+---
+
+## 2026-09-07 — Phase 11: Documentation and site fixes
+
+**Status:** Complete
+
+### What I did
+- Rewrote `README.md` to describe this project instead of the course template: what it is, repo layout, backend quick start with and without Docker, how to run tests and the docs site.
+- Rewrote `docs/index.md` from the template's "Sum Function in C++" sample into a project overview with team, problem, the five components from the proposal, and a status table.
+- Added `docs/architecture.md` (layers, the eight entities, health contract, containers and CI) and `docs/setup.md` (configure, run, test, add an entity).
+- Restored `docs/journals` and `docs/assets` as symlinks. They had been committed as 9-byte text files containing the literal string `../journals`, almost certainly from a Windows checkout, so the published site had no journals and no logo.
+- Pointed `mkdocs.yml` at this repository: site name, URL, repo link, copyright.
+- Changed the bot identity in `.github/workflows/mkdocs.yml` from the template author's personal address to the generic `github-actions[bot]` address. Every `gh-pages` deploy had been showing up as authored by him.
+- Removed the conda dependency from the `Makefile`. It hardcoded `~/miniconda3` and an env named `emacs`, so `make docs` failed on every machine but the template author's. It now just calls `mkdocs`.
+- Built the site locally and confirmed all three journals render.
+
+### Key decisions & reasoning
+- **Decision:** Two short docs pages, not one long one.
+  **Why:** Architecture is read once. Setup is read every time someone joins or reinstalls. Different audiences, different pages.
+- **Decision:** Keep the template's project-selection criteria page.
+  **Why:** It is the rubric the proposal was written against, and it explains why the project is scoped the way it is.
+- **Decision:** Leave `pyproject.toml`'s package name and author alone.
+  **Why:** Nothing consumes them, and the pytest configuration in that file is the only part that matters. Changing metadata nobody reads is churn.
+
+### Challenges & how I solved them
+- mkdocs flagged `[Journals](journals/)` as an unrecognised link because the folder has no `index.md`. Linked each member's journal directly instead.
+
+### Next steps
+- Workload scoring engine in `app/services/`, driven by the models and the compose Postgres.
+- Frontend integration against the API once its pages are restored.

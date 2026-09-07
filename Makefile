@@ -1,4 +1,4 @@
-﻿SHELL           := /usr/bin/zsh
+SHELL           := /usr/bin/zsh
 
 ### ---------------------------------------------------
 ### Icons
@@ -9,9 +9,6 @@ ICONS		+= simple/github simple/googlecolab simple/googleslides
 ### ---------------------------------------------------
 ### Make Documentation
 ### ---------------------------------------------------
-ENV 		:= emacs
-CONDA_ROOT	:= ~/miniconda3
-
 # HOST left blank to enable the default defined in the
 # underlying toolkit
 HOST		:=
@@ -36,9 +33,7 @@ ADDR_SWITCH	:= $(and $(ADDR),-a $(ADDR))
 
 PYTHONPATH	:= $${PYTHONPATH}:$${PWD}:$${PWD}/src
 
-mkdocs		+= source $(CONDA_ROOT)/bin/activate
-mkdocs		+= $(ENV) ; PYTHONPATH=$(PYTHONPATH)
-mkdocs		+= mkdocs
+mkdocs		:= PYTHONPATH=$(PYTHONPATH) mkdocs
 
 docserve : icons
 	$(mkdocs) serve $(ADDR_SWITCH) --livereload
