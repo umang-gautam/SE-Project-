@@ -102,3 +102,27 @@ Name: Khushi
 
 
 
+## 2026-09-08 — Phase 5: Backend re-based on the project blueprint
+
+**Status:** Complete
+
+### What I did
+- Moved the backend from `code/app` to `code/backend/app` so the frontend can live beside it under `code/frontend`. Added the full project blueprint as `docs/project-blueprint.pdf`; it is now the reference for every layer.
+- Replaced the SQLAlchemy models and the compose Postgres with `schema.sql`, the blueprint's Supabase DDL: UUID keys, CHECK constraints on score, duration and status, cascading FKs.
+- Rewrote `main.py` as an application factory: CORS for the Vite dev origin, a global handler that turns Supabase `HTTPStatusError`s into `{"status", "message"}` responses, `/health`. Routers get mounted as each entity lands.
+- `config.py` now reads `SUPABASE_URL`, `SUPABASE_KEY`, `CORS_ORIGINS`, `DEBUG`. `DATABASE_URL` is gone.
+- Updated `pyproject.toml` test paths and the backend CI workflow for the new folder.
+
+### Key decisions & reasoning
+- **Decision:** Schema lives in SQL, not ORM models.
+  **Why:** The request path is Supabase REST. Models nobody queries through are documentation pretending to be code. `schema.sql` is what actually gets pasted into the Supabase SQL editor.
+- **Decision:** Assignments hang off `topics`, not `subjects`.
+  **Why:** Urgency is computed per topic. An assignment on a subject cannot tell the scoring engine which topic to prioritise.
+- **Decision:** `/health` is a plain liveness probe again.
+  **Why:** With no direct database, the per-dependency status from Phase 6 had one field left. Docker's healthcheck only reads the status code.
+
+### Next steps
+- Pydantic schemas with Create, Update and Response variants for all eight entities.
+
+---
+

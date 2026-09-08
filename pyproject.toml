@@ -36,7 +36,8 @@ Issues = "https://github.com/tiet-unc512/ucs503p-202627odd-template/issues"
 # Adapted from https://stackoverflow.com/a/50156706
 [tool.pytest.ini_options]
 pythonpath = [
-  "code"
+  "code/backend"
 ]
-testpaths = ["code/tests"]
+testpaths = ["code/backend/tests"]
+asyncio_mode = "auto"
 # THE END -------------------------------------------
