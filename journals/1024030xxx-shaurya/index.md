@@ -199,3 +199,28 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 ### Next steps
 - Workload scoring engine in `app/services/`, driven by the models and the compose Postgres.
 - Frontend integration against the API once its pages are restored.
+
+---
+
+## 2026-09-08 — Phase 12: Scoring engine
+
+**Status:** Complete
+
+### What I did
+- `app/services/scoring_service.py`: three pure functions and one convenience wrapper.
+  - `compute_mastery(scores)`: mean of a topic's performance scores, normalised to 0 to 1. No scores means 0.
+  - `compute_urgency(due_dates, today)`: 1.0 if the nearest deadline is today or past, 0.0 at 30 days or more, linear in between. No deadlines means 0.
+  - `compute_priority(mastery, urgency)`: `100 × (0.6 × (1 − mastery) + 0.4 × urgency)`, rounded to two places.
+  - `score_topic(...)` returns all three as a dict ready for JSON.
+- 24 tests in `tests/test_scoring.py` covering boundaries (empty inputs, exactly at the horizon, past due), the weighting, the output range, and the full pipeline.
+
+### Key decisions & reasoning
+- **Decision:** No I/O in this module. It takes lists and dates, returns numbers.
+  **Why:** The formula is the part of the project most likely to be questioned in a viva and most likely to be tuned. Pure functions can be tested in milliseconds and doctested in the docstring.
+- **Decision:** Weights and horizon are module constants with defaults as function parameters.
+  **Why:** Tunable without touching callers, overridable per call in tests. A config table for two numbers would be ceremony.
+- **Decision:** Linear urgency decay, not exponential.
+  **Why:** Explainable in one sentence to a student. Sharper curves are a later experiment once real data exists.
+
+### Next steps
+- Plan generation: turn scored topics plus a time budget into sessions.
