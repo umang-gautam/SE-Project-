@@ -1,0 +1,5 @@
+/* Tailwind base layers — these three directives pull in Tailwind's
+   reset, component classes, and utility classes respectively. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
