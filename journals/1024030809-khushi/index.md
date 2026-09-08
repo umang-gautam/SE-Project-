@@ -126,3 +126,24 @@ Name: Khushi
 
 ---
 
+## 2026-09-08 — Phase 6: Pydantic schemas for all eight entities
+
+**Status:** Complete
+
+### What I did
+- One schema module per entity under `app/schemas/`, each with a `Create` model (request body), an `Update` model (all fields optional, for PATCH) and a `Response` model (what a Supabase row looks like). Enrollments and performance records have no `Update`: you delete and re-create them.
+- `app/schemas/__init__.py` re-exports everything so routes import from one place.
+- 19 tests in `tests/test_schemas.py`: required fields, empty strings rejected, score bounded 0 to 100 inclusive, duration must be positive, session status restricted to pending/done/missed, and `model_validate` from a plain dict.
+- `tests/conftest.py` provides a `TestClient` fixture for the route tests coming next.
+
+### Key decisions & reasoning
+- **Decision:** IDs are `str`, not `int` or `UUID`.
+  **Why:** Supabase returns UUIDs as JSON strings. Parsing them into `uuid.UUID` and back buys nothing and makes every test fixture noisier.
+- **Decision:** Validation rules mirror the CHECK constraints in `schema.sql`.
+  **Why:** A bad request should fail with a 422 before it reaches the network, but the database stays the last line of defence.
+
+### Next steps
+- Repository layer: one module per table, plain httpx calls to PostgREST.
+
+---
+
