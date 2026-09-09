@@ -13,3 +13,10 @@
 
 - Single API client module covering every backend endpoint.
 - Dashboard page showing scored topics.
+
+## API Client (Sept 9)
+
+- Added `src/api/client.js`, the single module every page imports for backend calls. Nothing else in the frontend calls `fetch` directly.
+- One `request()` helper sets JSON headers, treats 204 as `null`, and throws an `Error` carrying the backend's `detail` or `message` so pages can show it verbatim.
+- Named exports per endpoint group: students (including `fetchStudentScores`), subjects, topics, assignments, enrollments, performance, study plans (including `generatePlan`), study sessions (`updateSession`), and `triggerRebalance` for the agent.
+- Paths mirror the backend routers exactly, including the `by-subject`, `by-student`, `by-topic` and `by-plan` lookups.
