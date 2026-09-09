@@ -147,3 +147,24 @@ Name: Khushi
 
 ---
 
+## 2026-09-09 — Phase 7: Repositories for students, subjects, enrollments, topics
+
+**Status:** Complete
+
+### What I did
+- `app/repositories/student_repo.py`, `subject_repo.py`, `enrollment_repo.py`, `topic_repo.py`. Each exposes `create`, `get_all`, `get_by_id`, `update` (where the entity has an Update schema) and `delete`, plus the one lookup the domain needs: enrollments by student, topics by subject.
+- Every function opens a short-lived `httpx.AsyncClient` from `core/supabase_client.py`, makes one PostgREST call, raises on non-2xx, and returns raw dicts. No validation, no defaults, no joins.
+
+### Key decisions & reasoning
+- **Decision:** A new client per call instead of a module-level singleton.
+  **Why:** `httpx.AsyncClient` is cheap to build, and a singleton bound to one event loop breaks under `TestClient` and under uvicorn reloads. Learned this the hard way in the first scaffold.
+- **Decision:** `get_by_id` returns `None`, `delete` returns a bool.
+  **Why:** Routes decide what a missing row means (404). Repositories should not raise HTTP exceptions; they do not know they are inside an HTTP server.
+- **Decision:** Filters are PostgREST query params like `id=eq.<uuid>`, never string-built URLs.
+  **Why:** httpx encodes params; hand-built URLs are where injection and encoding bugs live.
+
+### Next steps
+- The other four repositories: assignments, performance records, study plans, study sessions.
+
+---
+
