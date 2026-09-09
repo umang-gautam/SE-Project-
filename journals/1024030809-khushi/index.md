@@ -168,3 +168,22 @@ Name: Khushi
 
 ---
 
+## 2026-09-09 — Phase 8: Repositories for assignments, performance, plans, sessions
+
+**Status:** Complete
+
+### What I did
+- `assignment_repo.py` (with `get_by_topic`), `performance_repo.py` (with `get_by_student` and `get_by_student_and_topic`), `study_plan_repo.py` (with `get_by_student`, newest first), `study_session_repo.py` (with `get_by_plan` and `create_many`).
+- `create_many` posts a JSON array to PostgREST in one request; plan generation will insert dozens of sessions at once and a request per row would be silly.
+
+### Key decisions & reasoning
+- **Decision:** Plans are ordered by `start_date` descending at the repository.
+  **Why:** "Most recent plan" is the only ordering anyone asks for. Doing it in the query keeps the agent's `get_plan` tool trivial.
+- **Decision:** `get_by_student_and_topic` on performance records rather than fetching all and filtering.
+  **Why:** Scoring calls it once per topic. Two `eq.` filters cost nothing server-side.
+
+### Next steps
+- Services and routes so the repositories are reachable over HTTP.
+
+---
+
