@@ -224,3 +224,28 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - Plan generation: turn scored topics plus a time budget into sessions.
+
+---
+
+## 2026-09-10 — Phase 13: Plan generation
+
+**Status:** Complete
+
+### What I did
+- `app/services/plan_service.py` in three parts:
+  - `get_student_topic_scores(student_id)`: walks enrollments, subjects, topics, pulls performance records and assignment due dates per topic, calls the scoring engine, returns topics sorted by priority descending.
+  - `allocate_sessions(scored_topics, start_date, num_days, minutes_per_day)`: pure. Splits the total budget across topics in proportion to priority, drops topics that would get under 30 minutes, cuts each share into 30 to 60 minute sessions around a 45 minute target, and places each session on the least-loaded day.
+  - `generate_plan(...)`: scores, allocates, saves the plan row and bulk-inserts the sessions, returns plan plus sessions plus scores.
+- `GET /students/{id}/scores` returns the scored topics. `POST /study-plans/generate` takes `student_id`, `hours_per_day` (up to 12), `num_days` (up to 90), optional `start_date`.
+- 11 tests on the allocator: proportional split, session length bounds, date range, and the empty and degenerate cases.
+
+### Key decisions & reasoning
+- **Decision:** The allocator is pure and the orchestrator is thin.
+  **Why:** Same reason as the scoring engine. Everything with a formula in it is testable without a network. Only the outer function knows repositories exist.
+- **Decision:** Least-loaded-day placement, not round robin.
+  **Why:** Round robin front-loads the first days when session counts differ per topic. Picking the emptiest day keeps daily load flat, which is the whole point of a balancer.
+- **Decision:** A 5 minute grace on the daily budget.
+  **Why:** 45 minute sessions never tile a 120 minute day exactly. Without grace the last session of a day gets dropped and the budget goes unused.
+
+### Next steps
+- The LangGraph agent that decides when to regenerate.

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
-from app.services import study_plan_service
+from app.services import study_plan_service, plan_service
 from app.schemas.study_plan import StudyPlanCreate, StudyPlanResponse
+from app.schemas.scoring import PlanGenerateRequest, PlanGenerateResponse
 
 router = APIRouter()
 
@@ -25,3 +26,14 @@ async def delete_study_plan(plan_id: str):
     if not success:
         raise HTTPException(status_code=404, detail="Study Plan not found")
 
+
+@router.post("/generate", response_model=PlanGenerateResponse, status_code=status.HTTP_201_CREATED)
+async def generate_study_plan(req: PlanGenerateRequest):
+    """Score all enrolled topics and generate a time-allocated study plan."""
+    result = await plan_service.generate_plan(
+        student_id=req.student_id,
+        hours_per_day=req.hours_per_day,
+        num_days=req.num_days,
+        start_date=req.start_date,
+    )
+    return result

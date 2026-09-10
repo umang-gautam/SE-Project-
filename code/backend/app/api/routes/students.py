@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
-from app.services import student_service
+from app.services import student_service, plan_service
 from app.schemas.student import StudentCreate, StudentUpdate, StudentResponse
+from app.schemas.scoring import TopicScoreResponse
 
 router = APIRouter()
 
@@ -33,3 +34,12 @@ async def delete_student(student_id: str):
     if not success:
         raise HTTPException(status_code=404, detail="Student not found")
 
+
+@router.get("/{student_id}/scores", response_model=list[TopicScoreResponse])
+async def get_student_scores(student_id: str):
+    """Return all enrolled topics scored by priority (highest first)."""
+    # Verify student exists
+    student = await student_service.get_student(student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    return await plan_service.get_student_topic_scores(student_id)
