@@ -187,3 +187,22 @@ Name: Khushi
 
 ---
 
+## 2026-09-10 — Phase 9: Service layer for all eight entities
+
+**Status:** Complete
+
+### What I did
+- One service module per entity under `app/services/`. Each function takes plain dicts and ids, calls exactly one repository function, and returns what it returns.
+- They are thin on purpose. The point of the layer is that routes and the agent both go through it, so business rules added later (duplicate-enrollment checks, plan archival) land in one place and apply to both callers.
+
+### Key decisions & reasoning
+- **Decision:** Services take `dict` payloads, not pydantic models.
+  **Why:** Routes call `model_dump(exclude_unset=True)` so PATCH only sends the fields the client set. The agent builds dicts directly. One signature serves both.
+- **Decision:** No service imports another service yet.
+  **Why:** The cross-entity logic belongs to the scoring and planning services, which Shaurya is building on top of these.
+
+### Next steps
+- Routes for every entity, mounted on the app, with the students router tested end to end.
+
+---
+
