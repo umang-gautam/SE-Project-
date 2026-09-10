@@ -206,3 +206,24 @@ Name: Khushi
 
 ---
 
+## 2026-09-10 — Phase 10: CRUD routes for every entity, mounted and tested
+
+**Status:** Complete
+
+### What I did
+- One router per entity under `app/api/routes/`, mounted in `main.py` with a prefix and tag each: `/students`, `/subjects`, `/enrollments`, `/topics`, `/assignments`, `/performance`, `/study-plans`, `/study-sessions`. Swagger at `/docs` now lists all of them.
+- Routes do HTTP only: validate with the schema, call one service function, turn `None` into 404 and `False` into 404, return 201 on create and 204 on delete.
+- Child lookups are `by-<parent>` paths, e.g. `/topics/by-subject/{id}`, `/study-sessions/by-plan/{id}`.
+- 9 tests in `tests/test_student_routes.py` patch the service module and cover create, 422 on a missing field, list, get, 404, update, delete. Students is the exemplar; the other routers are the same shape.
+
+### Key decisions & reasoning
+- **Decision:** Tests patch the service, not the repository.
+  **Why:** These are route tests. They check paths, validation, status codes and response shape. Whether the service does the right thing is a separate question.
+- **Decision:** PATCH bodies use `model_dump(exclude_unset=True)`.
+  **Why:** A client that sends only `{"name": ...}` must not null out the email. Only fields actually present in the request reach Supabase.
+
+### Next steps
+- Frontend can now be wired to real endpoints. Scoring and plan endpoints are Shaurya's.
+
+---
+
