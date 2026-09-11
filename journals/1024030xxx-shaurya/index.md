@@ -249,3 +249,26 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - The LangGraph agent that decides when to regenerate.
+
+---
+
+## 2026-09-11 — Phase 14: LangGraph agent, tools and graph
+
+**Status:** Complete
+
+### What I did
+- `app/agent/tools.py`: four async functions the agent is allowed to call. `get_scores`, `get_plan` (most recent plan with its sessions), `update_session_status`, `regenerate_plan`. Every one wraps a service function. The module imports nothing from `repositories` or `core.supabase_client`.
+- `app/agent/graph.py`: a LangGraph `StateGraph` over a `TypedDict` state. Nodes: `detect_change` reads the trigger and decides; a conditional edge sends the flow to `re_score` → `re_plan` → `explain_decision`, or to `no_change`. Triggers: `missed_session` always rebalances, `low_score` below 50, `new_assignment` due within 7 days, `manual` always.
+- `re_plan` derives the remaining days from the current plan's end date and estimates hours per day from its existing sessions, so a rebalance keeps the student's original budget instead of inventing one.
+- `explain_decision` builds a plain-text explanation: the trigger reason, the top three topics with mastery and urgency, and the new session count.
+
+### Key decisions & reasoning
+- **Decision:** Every node is deterministic Python. No LLM call.
+  **Why:** The blueprint's core guarantee is that the agent cannot bypass business rules. A deterministic graph makes that guarantee testable today. An LLM in `explain_decision` is a drop-in upgrade later and changes nothing about the safety argument.
+- **Decision:** The agent's only import path into the app is `app.services`.
+  **Why:** This is the viva point. It is enforced by a test in the next commit, not by convention.
+- **Decision:** Thresholds (50, 7 days) live in `detect_change`, not config.
+  **Why:** Two numbers. They will be tuned by editing the function that explains them.
+
+### Next steps
+- Service entry point, route, and tests that mock the tools.
