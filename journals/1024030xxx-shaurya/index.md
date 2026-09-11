@@ -272,3 +272,24 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - Service entry point, route, and tests that mock the tools.
+
+---
+
+## 2026-09-11 — Phase 15: Agent endpoint and tests
+
+**Status:** Complete
+
+### What I did
+- `services/agent_service.py`: `trigger_rebalance(student_id, trigger, details)` builds the initial state, runs the compiled graph with `ainvoke`, and returns `changes_needed`, `explanation` and `new_plan`.
+- `POST /agent/rebalance` with `RebalanceRequest` / `RebalanceResponse` schemas, mounted on the app.
+- `tests/test_agent.py`: 7 async tests that patch the four tools and run the real graph. Manual trigger runs the full path; missed session rebalances; a score of 72 does not, a score of 35 does; an assignment 20 days out does not, 3 days out does; the explanation names the top topics.
+- `tests/test_agent_safety.py`: reads `app/agent/*.py` as text and asserts no import of `repositories`, `supabase_client` or `httpx`. If someone adds a shortcut, CI goes red.
+
+### Key decisions & reasoning
+- **Decision:** Tests patch tools, not services or repositories.
+  **Why:** The tools are the agent's entire interface to the world. Patching there tests the graph's decisions in isolation, which is what the tests are about.
+- **Decision:** The import-boundary test is a source scan, not an `importlib` trick.
+  **Why:** It catches a lazy import inside a function body too. Grep is the right tool for "this file must never mention X".
+
+### Next steps
+- Containers and CI for the new layout.

@@ -24,6 +24,7 @@ from app.api.routes import (
     performance,
     study_plans,
     study_sessions,
+    agent,
 )
 
 
@@ -64,6 +65,7 @@ def create_app() -> FastAPI:
     app.include_router(performance.router, prefix="/performance", tags=["performance"])
     app.include_router(study_plans.router, prefix="/study-plans", tags=["study-plans"])
     app.include_router(study_sessions.router, prefix="/study-sessions", tags=["study-sessions"])
+    app.include_router(agent.router, prefix="/agent", tags=["agent"])
 
     return app
 
