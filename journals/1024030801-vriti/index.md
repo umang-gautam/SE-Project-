@@ -37,3 +37,18 @@ Frontend track, working alongside Umang on the React app under `code/frontend`.
 
 ### Next
 - Pull the badge and the topic card out into shared components.
+
+---
+
+## 2026-09-11 — Shared components: ScoreBadge and TopicCard
+
+### What I did
+- Moved `ScoreBadge` out of `PerformanceEntry.jsx` into `components/ScoreBadge.jsx` and `TopicScoreCard` (with its `getPriorityMeta` colour helper) out of `Dashboard.jsx` into `components/TopicCard.jsx`. The pages import them; behaviour and markup are unchanged.
+- This fills in two of the three component files the blueprint lists under `src/components/`.
+
+### Decisions
+- Pure move, no API changes, so the diff is reviewable as "cut here, paste there". Any tweak to the card's look is a separate commit.
+- `getPriorityMeta` stays private to `TopicCard`. Nothing else needs the colour tokens yet; exporting them now is guessing.
+
+### Next
+- `SessionBlock` from the study plan page, once Umang lands it.
