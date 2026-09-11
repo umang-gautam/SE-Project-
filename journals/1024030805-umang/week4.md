@@ -20,3 +20,10 @@
 - One `request()` helper sets JSON headers, treats 204 as `null`, and throws an `Error` carrying the backend's `detail` or `message` so pages can show it verbatim.
 - Named exports per endpoint group: students (including `fetchStudentScores`), subjects, topics, assignments, enrollments, performance, study plans (including `generatePlan`), study sessions (`updateSession`), and `triggerRebalance` for the agent.
 - Paths mirror the backend routers exactly, including the `by-subject`, `by-student`, `by-topic` and `by-plan` lookups.
+
+## Dashboard (Sept 11)
+
+- Replaced the placeholder Dashboard with the real one. A student selector at the top, then a grid of scored topic cards fetched from `GET /students/{id}/scores`, highest priority first.
+- Each card shows the rank, subject, topic name, and three bars: priority out of 100, mastery percent and urgency percent, plus a one-line action hint.
+- Priority above 70 is red "Urgent", 30 to 70 amber "Moderate", under 30 green "Strong". Same thresholds the scoring engine documents.
+- Empty states for no students, no enrollments and a failed request, each with its own message rather than a blank grid.
