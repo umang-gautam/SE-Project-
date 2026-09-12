@@ -52,3 +52,17 @@ Frontend track, working alongside Umang on the React app under `code/frontend`.
 
 ### Next
 - `SessionBlock` from the study plan page, once Umang lands it.
+
+---
+
+## 2026-09-12 — Shared component: SessionBlock
+
+### What I did
+- Moved `SessionCard` and its `getStatusBadgeConfig` helper out of `StudyPlanView.jsx` into `components/SessionBlock.jsx`, the name the blueprint uses. Props are unchanged: `session`, `topicName`, `isUpdating`, `onStatusChange`.
+- All three blueprint components now exist as real files. `StudyPlanView.jsx` drops by about 115 lines.
+
+### Decisions
+- Kept the status toggle inside the block rather than lifting it to the page. The block already receives `onStatusChange`; the page should not know what buttons exist.
+
+### Next
+- Pull the plan and session loading logic out of the page into `hooks/useStudyPlan.js`.
