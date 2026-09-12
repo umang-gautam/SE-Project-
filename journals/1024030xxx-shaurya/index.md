@@ -293,3 +293,23 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - Containers and CI for the new layout.
+
+---
+
+## 2026-09-12 — Phase 16: Backend image for the new layout
+
+**Status:** Complete
+
+### What I did
+- Rewrote `code/backend/Dockerfile` for the blueprint backend. Same shape as before: `python:3.12-slim`, requirements layer before code, non-root `api` user, `HEALTHCHECK` on `/health`, uvicorn on 8000. Dropped the `scripts/` copy since `init_db.py` went with the Postgres.
+- `PYTHONDONTWRITEBYTECODE` and `PYTHONUNBUFFERED` so the image has no `.pyc` litter and logs stream immediately.
+- Built and ran it with a dummy Supabase URL. `/health` answers `{"status":"ok"}` as the `api` user.
+
+### Key decisions & reasoning
+- **Decision:** `pytest` and `pytest-asyncio` stay in the image because they are in the one `requirements.txt`.
+  **Why:** Splitting dev requirements saves a few MB and costs a second file to keep in sync. Not worth it until image size matters.
+- **Decision:** No `.env` baked in, and `.env.example` is dockerignored.
+  **Why:** Same rule as before. Configuration enters through environment variables at run time.
+
+### Next steps
+- Frontend image and a compose file that runs both.

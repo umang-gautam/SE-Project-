@@ -1,7 +1,7 @@
 FROM python:3.12-slim
 
 WORKDIR /app
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 
 # Dependencies first so code edits don't invalidate the pip layer.
 COPY requirements.txt .
@@ -14,7 +14,6 @@ USER api
 
 EXPOSE 8000
 
-# Liveness only: /health returns 200 even when a dependency is down.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"
 
