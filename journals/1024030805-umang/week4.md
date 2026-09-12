@@ -27,3 +27,11 @@
 - Each card shows the rank, subject, topic name, and three bars: priority out of 100, mastery percent and urgency percent, plus a one-line action hint.
 - Priority above 70 is red "Urgent", 30 to 70 amber "Moderate", under 30 green "Strong". Same thresholds the scoring engine documents.
 - Empty states for no students, no enrollments and a failed request, each with its own message rather than a blank grid.
+
+## Study Plan page (Sept 12)
+
+- The biggest page. Three stacked panels: a generate form (hours per day, number of days, start date), a plan picker listing the student's existing plans newest first, and the sessions of the selected plan grouped by day.
+- Each session card shows topic, date, duration and a pending / done / missed toggle. Toggling updates optimistically and reverts with a message if the PATCH fails.
+- A "Rebalance" button posts to `/agent/rebalance` with the manual trigger and shows the agent's explanation text above the refreshed sessions.
+- Topic names come from a `topic_id → name` map built once from `/topics/` and topped up from the `topic_scores` returned by generation, so sessions never show bare UUIDs.
+- Generate form validates ranges client-side (1 to 12 hours, 1 to 90 days) to mirror the backend's pydantic bounds.
