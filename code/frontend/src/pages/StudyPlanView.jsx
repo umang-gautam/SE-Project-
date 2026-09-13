@@ -3,12 +3,11 @@ import {
   fetchStudents,
   generatePlan,
   fetchPlansByStudent,
-  fetchSessionsByPlan,
-  updateSession,
   triggerRebalance,
   fetchTopics,
 } from '../api/client.js';
 import SessionBlock from '../components/SessionBlock.jsx';
+import useStudyPlan from '../hooks/useStudyPlan.js';
 
 /**
  * Returns today's date formatted as YYYY-MM-DD in local time.
@@ -60,15 +59,15 @@ export default function StudyPlanView() {
   const [generatingPlan, setGeneratingPlan] = useState(false);
   const [generationError, setGenerationError] = useState(null);
 
-  // ── Existing plans & active sessions state ───────────────────────────
-  const [studentPlans, setStudentPlans] = useState([]);
-  const [selectedPlanId, setSelectedPlanId] = useState('');
-  const [sessions, setSessions] = useState([]);
-  const [loadingSessions, setLoadingSessions] = useState(false);
-  const [sessionsError, setSessionsError] = useState(null);
-
-  // ── Session update state ─────────────────────────────────────────────
-  const [updatingSessionId, setUpdatingSessionId] = useState(null);
+  // ── Plans, selected plan, sessions and status updates (hook) ────────
+  const {
+    studentPlans, setStudentPlans,
+    selectedPlanId, setSelectedPlanId,
+    sessions, setSessions,
+    loadingSessions, sessionsError,
+    loadPlanSessions, selectPlan: handlePlanSelectChange,
+    updatingSessionId, setSessionStatus: handleStatusChange,
+  } = useStudyPlan(selectedStudentId);
 
   // ── Rebalance state ──────────────────────────────────────────────────
   const [isRebalancing, setIsRebalancing] = useState(false);
@@ -113,79 +112,14 @@ export default function StudyPlanView() {
     loadTopics();
   }, []);
 
-  // ── 2. Load plans whenever selected student changes ──────────────────
-  const loadStudentPlans = async (studentId) => {
-    if (!studentId) {
-      setStudentPlans([]);
-      setSelectedPlanId('');
-      setSessions([]);
-      return;
-    }
-
-    setLoadingSessions(true);
-    setSessionsError(null);
-
-    try {
-      const plans = await fetchPlansByStudent(studentId);
-      const list = Array.isArray(plans) ? plans : [];
-      setStudentPlans(list);
-
-      if (list.length > 0) {
-        // Sort plans so the most recent is first
-        const sorted = [...list].sort(
-          (a, b) => new Date(b.start_date || 0) - new Date(a.start_date || 0)
-        );
-        setSelectedPlanId(sorted[0].id);
-        // Fetch sessions for this latest plan
-        await loadPlanSessions(sorted[0].id);
-      } else {
-        setSelectedPlanId('');
-        setSessions([]);
-      }
-    } catch (err) {
-      setSessionsError(err.message || 'Failed to load study plans.');
-      setSessions([]);
-    } finally {
-      setLoadingSessions(false);
-    }
-  };
-
-  const loadPlanSessions = async (planId) => {
-    if (!planId) {
-      setSessions([]);
-      return;
-    }
-    setLoadingSessions(true);
-    setSessionsError(null);
-    try {
-      const data = await fetchSessionsByPlan(planId);
-      setSessions(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setSessionsError(err.message || 'Failed to load study sessions.');
-      setSessions([]);
-    } finally {
-      setLoadingSessions(false);
-    }
-  };
-
+  // ── 2. Clear per-student messages when the selection changes ────────
   useEffect(() => {
     if (selectedStudentId) {
       setAgentExplanation(null);
       setGenerationError(null);
       setRebalanceError(null);
-      loadStudentPlans(selectedStudentId);
     }
   }, [selectedStudentId]);
-
-  // ── 3. Handle manual plan selection change ───────────────────────────
-  const handlePlanSelectChange = async (newPlanId) => {
-    setSelectedPlanId(newPlanId);
-    if (newPlanId) {
-      await loadPlanSessions(newPlanId);
-    } else {
-      setSessions([]);
-    }
-  };
 
   // ── 4. Plan Generation Form Submit ───────────────────────────────────
   const handleGeneratePlan = async (e) => {
@@ -247,33 +181,6 @@ export default function StudyPlanView() {
       setGenerationError(err.message || 'Failed to generate study plan.');
     } finally {
       setGeneratingPlan(false);
-    }
-  };
-
-  // ── 5. Session Status Toggle (calls updateSession) ────────────────────
-  const handleStatusChange = async (sessionId, newStatus) => {
-    const currentSession = sessions.find((s) => s.id === sessionId);
-    if (!currentSession || currentSession.status === newStatus) return;
-
-    // Optimistic update
-    const previousStatus = currentSession.status;
-    setSessions((prev) =>
-      prev.map((s) => (s.id === sessionId ? { ...s, status: newStatus } : s))
-    );
-
-    setUpdatingSessionId(sessionId);
-    try {
-      await updateSession(sessionId, { status: newStatus });
-    } catch (err) {
-      // Revert on error
-      setSessions((prev) =>
-        prev.map((s) =>
-          s.id === sessionId ? { ...s, status: previousStatus } : s
-        )
-      );
-      alert(`Could not update session status: ${err.message}`);
-    } finally {
-      setUpdatingSessionId(null);
     }
   };
 

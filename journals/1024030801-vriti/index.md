@@ -66,3 +66,19 @@ Frontend track, working alongside Umang on the React app under `code/frontend`.
 
 ### Next
 - Pull the plan and session loading logic out of the page into `hooks/useStudyPlan.js`.
+
+---
+
+## 2026-09-13 — useStudyPlan hook
+
+### What I did
+- Added `hooks/useStudyPlan.js`. Given a student id it owns the plan list, the selected plan, its sessions, the loading and error flags, and the optimistic status toggle. It reloads plans whenever the student changes and picks the newest.
+- `StudyPlanView.jsx` now destructures the hook and keeps only what is page-specific: the generate form, the rebalance panel and the topic-name map. The page lost roughly 130 more lines; the JSX did not change because the hook's values are destructured under the names the JSX already used.
+- The hook exposes its setters on purpose. Generation and rebalance both replace sessions and plans from their own responses.
+
+### Decisions
+- One hook, not three. Plans, selected plan and sessions are one piece of state that changes together; separate hooks would need to coordinate through the page.
+- Left `alert()` in the status-revert path as it was. Replacing it with an in-page message is a behaviour change for another commit.
+
+### Next
+- Environment-driven API base URL for deployments without the Vite proxy.
