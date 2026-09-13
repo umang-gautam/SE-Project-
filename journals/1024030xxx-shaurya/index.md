@@ -313,3 +313,24 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - Frontend image and a compose file that runs both.
+
+---
+
+## 2026-09-13 — Phase 17: Frontend image and full-stack compose
+
+**Status:** Complete
+
+### What I did
+- `code/frontend/Dockerfile`: two stages. `node:22-alpine` runs `npm ci` and `npm run build`; `nginx:1.27-alpine` serves the `dist/` output. The final image contains no Node.
+- `code/frontend/nginx.conf`: proxies `/api/` to `http://backend:8000/`, the same contract as the Vite dev proxy, so the API client needs no change between dev and container. `try_files` falls back to `index.html` so a refresh on `/study-plan` does not 404.
+- `code/docker-compose.yml`: `backend` (exposed only on the internal network) and `frontend` (published on 8080). Supabase values come from `backend/.env`; CORS origins are set for both the nginx and Vite ports.
+- Verified: `docker compose up --build`, then `curl localhost:8080/` returns the app shell and `curl localhost:8080/api/health` returns the backend's `{"status":"ok"}` through nginx.
+
+### Key decisions & reasoning
+- **Decision:** nginx proxy instead of exposing the backend port and using CORS.
+  **Why:** One origin, one port, no CORS in production. CORS stays configured only because the Vite dev server is a different origin.
+- **Decision:** The backend is not published on the host in compose.
+  **Why:** Nothing outside the compose network needs it. Fewer open ports is the default, opening one is a decision.
+
+### Next steps
+- CI for both halves.

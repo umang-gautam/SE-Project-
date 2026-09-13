@@ -1,0 +1,18 @@
+# Full stack in two containers.
+#   cp backend/.env.example backend/.env      # fill in Supabase values
+#   docker compose up --build                 # frontend on http://localhost:8080
+services:
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      CORS_ORIGINS: http://localhost:8080,http://localhost:5173
+    expose:
+      - "8000"
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
