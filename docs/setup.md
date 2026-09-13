@@ -1,53 +1,46 @@
-# Backend setup
+# Setup
 
-Everything runs from `code/`. You need a Supabase project with the eight
-tables; ask the team for the URL and service key.
+Everything lives under `code/`. You need a Supabase project with the tables
+from `code/backend/schema.sql`: paste the file into the Supabase SQL editor once.
 
 ## Configure
 
 ```sh
-cd code
+cd code/backend
 cp .env.example .env
-# edit .env: SUPABASE_URL, SUPABASE_SERVICE_KEY
+# edit .env: SUPABASE_URL, SUPABASE_KEY
 ```
 
-`.env` is git-ignored and Docker-ignored. Keep it that way.
+`.env` is git-ignored and docker-ignored. Keep it that way.
 
-## Run with Docker (recommended)
+## Run everything with Docker
 
 ```sh
+cd code
 docker compose up --build
 ```
 
-- API: <http://localhost:8000>, interactive docs at <http://localhost:8000/docs>
-- Postgres: `localhost:5432`, user/password/db all `balancer`
+- App: <http://localhost:8080>
+- API through the frontend proxy: <http://localhost:8080/api/health>
 
-Create the tables in the local Postgres once:
+## Run the pieces directly
 
-```sh
-docker compose run --rm api python scripts/init_db.py
-```
-
-Check everything is wired:
+Backend, Python 3.10+:
 
 ```sh
-curl localhost:8000/health
-# {"status":"ok","database":"ok","supabase":"ok"}
+cd code/backend
+python -m venv venv && source venv/bin/activate     # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload                        # http://localhost:8000/docs
 ```
 
-## Run without Docker
-
-Python 3.10 or newer.
+Frontend, Node 22:
 
 ```sh
-python -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
-pip install -r requirements.txt -r requirements-dev.txt
-uvicorn app.main:app --reload
+cd code/frontend
+npm install
+npm run dev                                          # http://localhost:5173, proxies /api to :8000
 ```
-
-To also use the compose Postgres from a bare uvicorn, start only the database
-with `docker compose up db` and uncomment `DATABASE_URL` in `.env`.
 
 ## Tests
 
@@ -57,11 +50,12 @@ From the repository root:
 pytest
 ```
 
-No credentials or network needed. The repository layer is monkeypatched.
+No credentials or network needed. Route tests patch services, agent tests patch
+the agent's tools, and the scoring and allocation tests are pure functions.
 
 ## Adding an entity
 
-Copy the four-file pattern from `students`: a schema in `app/schemas/`, a
-repository in `app/repositories/`, a service in `app/services/`, a route in
-`app/api/routes/`. Register the router in `app/main.py`. Add a model in
-`app/models/` and import it in `app/models/__init__.py`.
+Follow `students` through the layers: schema in `app/schemas/`, repository in
+`app/repositories/`, service in `app/services/`, router in `app/api/routes/`,
+then `include_router` in `app/main.py`. Add the table to `schema.sql` and the
+client functions to `frontend/src/api/client.js`.

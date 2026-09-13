@@ -227,3 +227,22 @@ Name: Khushi
 
 ---
 
+## 2026-09-13 — Phase 11: Architecture and setup documentation
+
+**Status:** Complete
+
+### What I did
+- Rewrote `docs/architecture.md` for the blueprint backend: the layer table with what each layer does and does not do, the eight-table schema with the two non-obvious design choices explained, the scoring formulas, the agent graph, the full API surface, the frontend layout, and the container and CI files.
+- Rewrote `docs/setup.md`: Supabase schema step, `.env`, compose, running backend and frontend directly, tests, and the "adding an entity" checklist that walks the layers in order.
+
+### Key decisions & reasoning
+- **Decision:** The architecture page repeats the layering rule in its first paragraph and again in the layer table's "does not" column.
+  **Why:** It is the one thing a new contributor must not get wrong, and the thing the viva will ask about.
+- **Decision:** Setup starts with the SQL file, not with Python.
+  **Why:** Every "it doesn't work" so far has been a missing table or a missing `.env`.
+
+### Next steps
+- Business rules in services once the frontend surfaces real usage.
+
+---
+
