@@ -3,13 +3,16 @@ name: backend
 on:
   push:
     branches: [main]
-    paths: ["code/**", "pyproject.toml", ".github/workflows/backend.yml"]
+    paths: ["code/backend/**", "pyproject.toml", ".github/workflows/backend.yml"]
   pull_request:
-    paths: ["code/**", "pyproject.toml", ".github/workflows/backend.yml"]
+    paths: ["code/backend/**", "pyproject.toml", ".github/workflows/backend.yml"]
 
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: http://supabase.invalid
+      SUPABASE_KEY: ci-dummy
     steps:
       - uses: actions/checkout@v4
 
@@ -26,12 +29,12 @@ jobs:
         run: pytest -q
 
       - name: Build image
-        run: docker build -t workload-api:${{ github.sha }} code/backend
+        run: docker build -t workload-backend:${{ github.sha }} code/backend
 
       - name: Smoke-test image
         run: |
-          docker run -d --rm --name api -p 8000:8000 \
-            -e SUPABASE_URL=http://supabase.invalid -e SUPABASE_KEY=k \
-            workload-api:${{ github.sha }}
+          docker run -d --rm --name backend -p 8000:8000 \
+            -e SUPABASE_URL=$SUPABASE_URL -e SUPABASE_KEY=$SUPABASE_KEY \
+            workload-backend:${{ github.sha }}
           for i in $(seq 1 15); do curl -sf localhost:8000/health && break; sleep 1; done
-          docker stop api
+          docker stop backend

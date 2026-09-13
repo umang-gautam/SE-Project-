@@ -334,3 +334,25 @@ Backend track. Picks up from Khushi's Phase 4 (schema designed, models pending).
 
 ### Next steps
 - CI for both halves.
+
+---
+
+## 2026-09-13 — Phase 18: CI for both halves
+
+**Status:** Complete
+
+### What I did
+- `.github/workflows/backend.yml` now triggers only on `code/backend/**`. It installs, runs the 71 tests with dummy Supabase env vars, builds the image, starts it and curls `/health`.
+- New `.github/workflows/frontend.yml` on `code/frontend/**`: Node 22, `npm ci`, `npm run build`, then builds the nginx image so a broken `nginx.conf` or Dockerfile fails here and not on deploy.
+- Both workflows cache dependencies keyed on the lockfile.
+
+### Key decisions & reasoning
+- **Decision:** Two workflows, path-filtered, instead of one.
+  **Why:** A journal edit or a frontend-only change should not run the Python suite and vice versa. The GitHub UI also shows which half broke at a glance.
+- **Decision:** Dummy Supabase env at the job level.
+  **Why:** `Settings()` refuses to construct without them. Nothing in CI reaches the network; the tests patch the service or tool layer.
+- **Decision:** No lint step yet.
+  **Why:** The blueprint says "pytest + lint". Nobody has agreed on a linter or a config, and a lint step that everyone ignores is worse than none. Add ruff and eslint together when the team picks them.
+
+### Next steps
+- Docs for the new layout are Khushi's and the frontend team's.
