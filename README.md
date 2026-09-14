@@ -2,48 +2,36 @@
 
 UCS503P Software Engineering project, TIET Patiala, 2026-27 ODD.
 
-Students enter subjects, topics, deadlines and available hours. A deterministic
-engine turns that into a prioritised weekly study plan and re-balances it as
-the student logs progress. A reasoning agent explains the plan in plain
-language but is never allowed to change it.
+A student enters subjects, topics, deadlines and scores. A deterministic
+scoring engine ranks every topic by how weak and how urgent it is, a planner
+turns that into a weekly schedule of 30 to 60 minute sessions, and a LangGraph
+agent rebalances the plan when sessions are missed, scores drop or deadlines
+move. The agent explains its decisions and cannot bypass the business rules:
+it only reaches the system through the service layer.
 
-Full proposal: [`project-proposal/main.pdf`](project-proposal/main.pdf).
-Docs site: built from `docs/` and `journals/` by mkdocs on every push to `main`.
+Blueprint: [`docs/project-blueprint.pdf`](docs/project-blueprint.pdf).
+Docs site: built from `docs/` and `journals/` on every push to `main`.
 
 ## Layout
 
 | Path | What |
 |---|---|
-| `code/` | FastAPI backend. See [`docs/setup.md`](docs/setup.md) and [`docs/architecture.md`](docs/architecture.md). |
-| `journals/<roll>-<name>/` | One folder per team member, `index.md` is the entry point. Published on the docs site. |
-| `docs/` | Project documentation (mkdocs, Material theme). |
-| `project-proposal/` | Proposal report, LaTeX. |
-| `project-report-prototype-stage/`, `project-report-final/` | Later reports, not started. |
+| `code/backend/` | FastAPI API, scoring engine, planner, agent. [Architecture](docs/architecture.md) |
+| `code/frontend/` | React app. [Frontend](docs/frontend.md) |
+| `code/docker-compose.yml` | Both, one command |
+| `journals/<roll>-<name>/` | One folder per team member, published on the docs site |
+| `docs/` | mkdocs source |
+| `project-proposal/` | Proposal report, LaTeX |
 
-## Quick start (backend)
-
-```sh
-cd code
-cp .env.example .env          # fill in Supabase URL and service key
-docker compose up --build     # API on http://localhost:8000, Swagger at /docs
-docker compose run --rm api python scripts/init_db.py   # tables in the local Postgres
-```
-
-Without Docker:
+## Quick start
 
 ```sh
-cd code
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt -r requirements-dev.txt
-uvicorn app.main:app --reload
+cd code/backend && cp .env.example .env     # add SUPABASE_URL and SUPABASE_KEY
+cd .. && docker compose up --build          # http://localhost:8080
 ```
 
-Tests, from the repo root: `pytest`.
+Without Docker, see [Setup](docs/setup.md). Tests run from the repo root with `pytest`.
 
-## Docs site locally
+## Team
 
-```sh
-pip install mkdocs-material mkdocs-literate-nav mkdocs-section-index \
-  mkdocs-git-revision-date-localized-plugin mkdocs-git-authors-plugin mkdocstrings[python]
-make docs        # or: mkdocs serve
-```
+Umang (frontend), Vriti (frontend), Khushi (backend API), Shaurya (scoring, agent, infrastructure).

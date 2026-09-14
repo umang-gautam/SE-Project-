@@ -40,3 +40,14 @@
 
 - Wrote `docs/frontend.md`: the route-to-file table, what each shared component and the hook do, the three ways `/api` reaches the backend, and the conventions we follow for state, errors and styling.
 - Kept it to one page. Anyone who reads it and `api/client.js` can find their way around the rest.
+
+## README and project index (Sept 14)
+
+- Rewrote `README.md` and `docs/index.md` so both describe what the system does now, where each piece lives, and a two-line quick start. Added a team line with who owns what.
+- Status table on the index lists every area and what is still not started, so nobody has to read the journals to know where we are.
+
+## Next Steps
+
+- Deploy: backend to Render, frontend to Vercel with `VITE_API_BASE` set.
+- Link Dashboard cards to the study plan for that topic.
+- Prototype-stage report.

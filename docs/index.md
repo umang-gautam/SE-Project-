@@ -5,40 +5,42 @@
 
 # AI-Powered Student Workload Balancer
 
-**Team**: Umang (1024030805), Khushi (1024030809), Shaurya (1024030xxx)
+**Team**: Umang (1024030805), Vriti (1024030801), Khushi (1024030809), Shaurya (1024030xxx)
 
 ## The problem
 
-Students juggling several subjects and deadlines plan their week by hand, and
-the plan goes stale the moment they fall behind. Most tools do not adapt to
-actual progress, distribute effort unevenly across subjects, and never explain
-*why* a plan looks the way it does.
+Students juggling several subjects plan their week by hand, and the plan goes
+stale the moment they fall behind. Most tools do not adapt to actual progress,
+spread effort unevenly across subjects, and never explain *why* a plan looks the
+way it does.
 
-## What we are building
+## What we built
 
-A web application with five parts:
+1. **Scoring engine.** Every topic gets a priority from how weak the student is in it and how close its deadlines are.
+2. **Planner.** A time budget becomes a schedule of 30 to 60 minute sessions, heaviest topics first, spread evenly across days.
+3. **Rebalancing agent.** A LangGraph state machine watches for missed sessions, low scores and new deadlines, regenerates the plan when warranted, and explains what changed.
+4. **Web app.** Dashboard of ranked topics, subject and topic management, score entry, and a study plan view with status tracking and a rebalance button.
 
-1. **Student input portal** for subjects, topics, deadlines, assignments and available hours.
-2. **Deterministic workload engine** that scores topics by deadline proximity, weight and past performance, and produces a prioritised weekly plan.
-3. **Adaptive feedback loop** that re-balances the remaining plan when sessions are completed or missed.
-4. **Reasoning agent** (LangGraph) that explains the plan. It can read the engine's output but cannot bypass it.
-5. **Progress dashboard** for plan adherence and upcoming priorities.
-
-The full argument is in the [project proposal](https://github.com/umang-gautam/SE-Project-/blob/main/project-proposal/main.pdf).
+The agent's only path into the system is the service layer. It cannot touch the
+database. This is enforced by a test, not a convention.
 
 ## Where things are
 
-- [Architecture](architecture.md): the backend's layers and data model.
-- [Setup](setup.md): running the backend locally, with or without Docker.
-- Journals, weekly per member: [Umang](journals/1024030805-umang/index.md), [Khushi](journals/1024030809-khushi/index.md), [Shaurya](journals/1024030xxx-shaurya/index.md).
-- [Project selection criteria](criteria-for-project-selection.md): the course rubric this project was chosen against.
+- [Architecture](architecture.md): layers, data model, scoring, agent, API.
+- [Setup](setup.md): running it, with or without Docker.
+- [Frontend](frontend.md): pages, components, how `/api` reaches the backend.
+- [Project blueprint](project-blueprint.pdf): the design this follows.
+- Journals: [Umang](journals/1024030805-umang/index.md), [Vriti](journals/1024030801-vriti/index.md), [Khushi](journals/1024030809-khushi/index.md), [Shaurya](journals/1024030xxx-shaurya/index.md).
+- [Project selection criteria](criteria-for-project-selection.md): the course rubric.
 
-## Status (September 2026)
+## Status (14 September 2026)
 
 | Area | State |
 |---|---|
-| Backend API | CRUD for all eight entities over Supabase, containerised, tested in CI |
-| Data model | Eight tables designed and encoded as SQLAlchemy models |
-| Frontend | React + Vite, eight module pages, in progress (see Umang's journal) |
-| Workload engine | Not started |
-| Reasoning agent | Not started |
+| Backend API | CRUD for all eight entities, scores, plan generation, agent endpoint. 71 tests. |
+| Scoring and planning | Done, pure functions, unit tested |
+| Agent | Deterministic LangGraph graph, four triggers, import boundary enforced by test |
+| Frontend | Four pages wired to the API, shared components, plan hook |
+| Containers and CI | Backend and frontend images, compose, two path-filtered workflows |
+| Deployment | Not started. Blueprint targets Render or Railway for the backend, Vercel for the frontend. |
+| Prototype and final reports | Not started |
