@@ -35,3 +35,8 @@
 - A "Rebalance" button posts to `/agent/rebalance` with the manual trigger and shows the agent's explanation text above the refreshed sessions.
 - Topic names come from a `topic_id → name` map built once from `/topics/` and topped up from the `topic_scores` returned by generation, so sessions never show bare UUIDs.
 - Generate form validates ranges client-side (1 to 12 hours, 1 to 90 days) to mirror the backend's pydantic bounds.
+
+## Frontend docs (Sept 14)
+
+- Wrote `docs/frontend.md`: the route-to-file table, what each shared component and the hook do, the three ways `/api` reaches the backend, and the conventions we follow for state, errors and styling.
+- Kept it to one page. Anyone who reads it and `api/client.js` can find their way around the rest.
