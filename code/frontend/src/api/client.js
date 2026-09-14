@@ -2,10 +2,14 @@
  * API client — single source of truth for all backend calls.
  *
  * Every component imports from here instead of writing its own fetch().
- * The base URL points to the Vite dev proxy (/api → http://localhost:8000).
+ *
+ * Base URL: VITE_API_BASE if set at build time, otherwise '/api', which the
+ * Vite dev server and the nginx container both proxy to the backend. Set
+ * VITE_API_BASE only for hosting where no proxy sits in front (e.g. a
+ * static host talking to a separately deployed backend).
  */
 
-const BASE = '/api';
+const BASE = (import.meta.env.VITE_API_BASE || '/api').replace(/\/$/, '');
 
 async function request(path, options = {}) {
   const url = `${BASE}${path}`;

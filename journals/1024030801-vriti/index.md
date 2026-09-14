@@ -82,3 +82,18 @@ Frontend track, working alongside Umang on the React app under `code/frontend`.
 
 ### Next
 - Environment-driven API base URL for deployments without the Vite proxy.
+
+---
+
+## 2026-09-14 — Environment-driven API base URL
+
+### What I did
+- `api/client.js` now reads `VITE_API_BASE` at build time and falls back to `/api`. A trailing slash is stripped so `${BASE}/students/` never doubles up.
+- Added `code/frontend/.env.example` explaining when to set it: only when the frontend is hosted somewhere without a proxy in front, which is the blueprint's Vercel-plus-Render deployment.
+
+### Decisions
+- Fallback stays `/api` so nothing changes for `npm run dev` or docker compose. The variable is opt-in.
+- Vite inlines `import.meta.env.*` at build time, so this is a build setting, not a runtime one. Documented in the comment so nobody expects to change it on a running container.
+
+### Next
+- Wire the Dashboard cards to link into the study plan for that topic.
